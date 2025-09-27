@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="pt-BR"> <!-- Define o idioma da página como português do Brasil -->
+<head>
+<meta charset="UTF-8"> <!-- Define a codificação de caracteres como UTF-8 -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Responsivo para dispositivos móveis -->
+<title>Painel de Planilhas</title> <!-- Título da aba do navegador -->
+
+<style>
+  /* RESET E FONTE */
+  * {margin:0;padding:0;box-sizing:border-box;font-family:Arial, sans-serif;} /* Remove margens e padding padrão, aplica box-sizing e fonte */
+  body, html {height:100%;} /* Define altura total para body e html */
+
+  /* ESTILO DA PÁGINA DE LOGIN/REGISTRO */
+  body.login-page{display:flex;justify-content:center;align-items:center;background:#1b1b1b;} /* Centraliza o conteúdo e aplica fundo preto escuro */
+  
+  .container{ 
+    background:#2c2c2c; /* Fundo cinza escuro da caixa */
+    padding:2rem; /* Espaçamento interno */
+    border-radius:15px; /* Cantos arredondados */
+    width:100%; /* Largura máxima da tela */
+    max-width:380px; /* Limite máximo da largura */
+    text-align:center; /* Centraliza textos */
+    transition: all 0.3s ease; /* Transição suave para hover/alterações */
+    color:#fff; /* Cor do texto branca */
+    
+    /* Borda neon rosa */
+    border: 2px solid #ff00ff; /* Borda rosa neon */
+    box-shadow: 0 0 10px #ff00ff, 0 0 20px #ff00ff, 0 0 30px #ff00ff; /* Efeito de brilho neon */
+  }
+
+  h2{margin-bottom:1rem;color:#fff;} /* Título dentro das caixas */
+
+  .input-field{margin:12px 0;text-align:left;} /* Espaçamento entre campos */
+  .input-field label{font-size:0.9rem;color:#ccc;} /* Estilo do label */
+  .input-field input{
+    width:100%; /* Largura total do campo */
+    padding:12px; /* Espaçamento interno */
+    margin-top:5px; /* Espaço entre label e input */
+    border:1px solid #555; /* Borda cinza escuro */
+    border-radius:10px; /* Cantos arredondados */
+    background:#1b1b1b; /* Fundo preto escuro */
+    color:#fff; /* Texto branco */
+    outline:none; /* Remove contorno padrão do focus */
+    transition:0.3s; /* Transição suave */
+  }
+  .input-field input:focus{border-color:#8e44ad;} /* Muda a borda para roxo escuro quando selecionado */
+
+  .btn{
+    margin-top:15px; /* Espaço acima do botão */
+    padding:12px; /* Espaço interno */
+    width:100%; /* Botão ocupa toda a largura */
+    background:#8e44ad; /* Cor de fundo roxo escuro */
+    border:none; /* Remove borda */
+    border-radius:10px; /* Cantos arredondados */
+    color:#fff; /* Texto branco */
+    font-size:1rem; /* Tamanho da fonte */
+    cursor:pointer; /* Cursor tipo ponteiro */
+    transition:0.3s; /* Suaviza mudança de cor */
+  }
+  .btn:hover{background:#5e3370;} /* Escurece botão no hover */
+
+  .toggle{margin-top:1rem;font-size:0.9rem;color:#ccc;cursor:pointer;} /* Texto para alternar login/registro */
+  .toggle span{color:#ff00ff;font-weight:bold;} /* Destaca "Registre-se" ou "Faça login" */
+  .hidden{display:none;} /* Classe para esconder elementos */
+
+  /* ESTILO DA PÁGINA DE PAINEL */
+  body.panel-page{display:flex;height:100%;background:#121212;color:#fff;} /* Página com fundo quase preto e texto branco */
+  
+  .sidebar{
+    width:220px; /* Largura da barra lateral */
+    background:#000; /* Fundo preto */
+    padding:30px 20px; /* Espaço interno */
+    box-shadow:2px 0 10px rgba(0,0,0,0.5); /* Sombra lateral */
+    display:flex;flex-direction:column;gap:15px; /* Itens organizados em coluna com espaço */
+    position:fixed; /* Fixa a barra lateral */
+    height:100%; /* Altura total */
+  }
+
+  .sidebar h3{
+    margin-bottom:20px; /* Espaço abaixo do título */
+    color:#8e44ad; /* Cor roxo escuro */
+    text-align:center; /* Centraliza texto */
+    font-size:1.3rem; /* Tamanho do título */
+  }
+
+  .sidebar button{
+    padding:12px; /* Espaço interno */
+    border:none; /* Remove borda */
+    border-radius:10px; /* Cantos arredondados */
+    cursor:pointer; /* Cursor ponteiro */
+    background:#2c2c2c; /* Cor de fundo da barra lateral */
+    color:#fff; /* Texto branco */
+    font-weight:bold; /* Negrito */
+    font-size:1rem; /* Tamanho da fonte */
+    transition:all 0.3s; /* Transição suave */
+    box-shadow:0 4px 6px rgba(0,0,0,0.3); /* Sombra sutil */
+  }
+  .sidebar button:hover{
+    background:#8e44ad; /* Muda para roxo escuro */
+    transform:translateY(-2px); /* Levanta botão */
+    box-shadow:0 6px 12px rgba(0,0,0,0.5); /* Sombra mais intensa */
+  }
+
+  .main{
+    margin-left:220px; /* Espaço para sidebar */
+    flex:1;
+    padding:30px;
+    display:flex;
+    flex-direction:column;
+    gap:20px;
+    background:#1b1b1b; /* Fundo da área principal */
+  }
+
+  .main h2{color:#8e44ad;margin-bottom:15px;} /* Título roxo escuro na área principal */
+
+  .planilha-card{
+    background:#2c2c2c; /* Fundo do card */
+    padding:20px; /* Espaço interno */
+    border-radius:15px; /* Cantos arredondados */
+    box-shadow:0 4px 15px rgba(0,0,0,0.5); /* Sombra */
+    transition:transform 0.3s, box-shadow 0.3s; /* Suaviza hover */
+  }
+  .planilha-card:hover{
+    transform:translateY(-5px); /* Eleva card no hover */
+    box-shadow:0 8px 25px rgba(0,0,0,0.7); /* Sombra mais intensa */
+  }
+</style>
+</head>
+<body class="login-page">
+
+  <!-- LOGIN -->
+  <div class="container" id="loginForm">
+    <h2>Login</h2>
+    <div class="input-field">
+      <label for="loginEmail">Email</label>
+      <input type="email" id="loginEmail" placeholder="Digite seu email">
+    </div>
+    <div class="input-field">
+      <label for="loginSenha">Senha</label>
+      <input type="password" id="loginSenha" placeholder="Digite sua senha">
+    </div>
+    <button class="btn" onclick="login()">Entrar</button> <!-- Chama função login -->
+    <p class="toggle">Não tem conta? <span onclick="showRegister()">Registre-se</span></p> <!-- Alterna para registro -->
+  </div>
+
+  <!-- REGISTRO -->
+  <div class="container hidden" id="registerForm">
+    <h2>Registrar</h2>
+    <div class="input-field">
+      <label for="regEmail">Email</label>
+      <input type="email" id="regEmail" placeholder="Digite seu email">
+    </div>
+    <div class="input-field">
+      <label for="regSenha">Senha</label>
+      <input type="password" id="regSenha" placeholder="Digite sua senha">
+    </div>
+    <div class="input-field">
+      <label for="regConfirma">Confirmar Senha</label>
+      <input type="password" id="regConfirma" placeholder="Confirme sua senha">
+    </div>
+    <button class="btn" onclick="register()">Registrar</button> <!-- Chama função registrar -->
+    <p class="toggle">Já tem conta? <span onclick="showLogin()">Faça login</span></p> <!-- Alterna para login -->
+  </div>
+
+  <!-- PAINEL -->
+  <div class="panel hidden" id="panelPage">
+    <div class="sidebar">
+      <h3>Painel</h3>
+      <button onclick="showPlanilha(1)">Planilha 1</button>
+      <button onclick="showPlanilha(2)">Planilha 2</button>
+      <button onclick="showPlanilha(3)">Planilha 3</button>
+    </div>
+    <div class="main" id="mainContent">
+      <h2>Bem-vindo!</h2>
+      <p>Escolha uma planilha na coluna à esquerda.</p>
+    </div>
+  </div>
+
+  <script>
+    // Mostra formulário de registro e esconde login
+    function showRegister() {
+      document.getElementById("loginForm").classList.add("hidden");
+      document.getElementById("registerForm").classList.remove("hidden");
+    }
+
+    // Mostra formulário de login e esconde registro
+    function showLogin() {
+      document.getElementById("registerForm").classList.add("hidden");
+      document.getElementById("loginForm").classList.remove("hidden");
+    }
+
+    // Função para registrar usuário
+    function register() {
+      let email = document.getElementById("regEmail").value;
+      let senha = document.getElementById("regSenha").value;
+      let confirma = document.getElementById("regConfirma").value;
+
+      if(!email || !senha || !confirma){alert("Preencha todos os campos!"); return;} // Valida campos vazios
+      if(!email.includes("@")){alert("Digite um email válido!"); return;} // Valida email com @
+      if(senha.length < 6){alert("A senha deve ter pelo menos 6 caracteres!"); return;} // Valida tamanho mínimo
+      if(senha!==confirma){alert("As senhas não conferem!"); return;} // Confirma senha
+
+      // Armazena email e senha no localStorage
+      localStorage.setItem("userEmail",email);
+      localStorage.setItem("userSenha",senha);
+      alert("Conta criada com sucesso!");
+      showLogin(); // Volta para login
+    }
+
+    // Função de login
+    function login() {
+      let email = document.getElementById("loginEmail").value;
+      let senha = document.getElementById("loginSenha").value;
+      if(!email || !senha){alert("Preencha todos os campos!");return;} // Valida campos
+      const storedEmail = localStorage.getItem("userEmail");
+      const storedSenha = localStorage.getItem("userSenha");
+      if(email===storedEmail && senha===storedSenha){
+        document.body.classList.remove("login-page");
+        document.body.classList.add("panel-page"); // Mostra página de painel
+        document.getElementById("loginForm").classList.add("hidden");
+        document.getElementById("panelPage").classList.remove("hidden");
+      } else {alert("Email ou senha incorretos!");}
+    }
+
+    // Exibe conteúdo da planilha selecionada
+    function showPlanilha(num){
+      const main=document.getElementById("mainContent");
+      main.innerHTML=`<h2>Planilha ${num}</h2>
+      <div class="planilha-card"><p>Conteúdo da Planilha ${num} aqui.</p></div>`;
+    }
+  </script>
+</body>
+</html>s
