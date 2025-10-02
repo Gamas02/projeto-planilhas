@@ -227,7 +227,15 @@
       const main=document.getElementById("mainContent");
       main.innerHTML=`<h2>Planilha ${num}</h2>
       <div class="planilha-card"><p>Conteúdo da Planilha ${num} aqui.</p></div>`;
+
+      const email = localStorage.getItem("userEmail");
+
+      if(email === "admin@gmail.com"){
+        const adminMensage = document.createElement("p");
+        adminMensage.textContent = "Sou Admin";
+        main.appendChild(adminMensage);
+      }
     }
   </script>
 </body>
-</html>s
+</html>
