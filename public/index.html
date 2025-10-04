@@ -1,241 +1,444 @@
 <!DOCTYPE html>
-<html lang="pt-BR"> <!-- Define o idioma da página como português do Brasil -->
+<html lang="pt-BR">
 <head>
-<meta charset="UTF-8"> <!-- Define a codificação de caracteres como UTF-8 -->
-<meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Responsivo para dispositivos móveis -->
-<title>Painel de Planilhas</title> <!-- Título da aba do navegador -->
-
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sistema com Painel Dinâmico</title>
 <style>
-  /* RESET E FONTE */
-  * {margin:0;padding:0;box-sizing:border-box;font-family:Arial, sans-serif;} /* Remove margens e padding padrão, aplica box-sizing e fonte */
-  body, html {height:100%;} /* Define altura total para body e html */
+  *{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif;}
+  body,html{height:100%;}
 
-  /* ESTILO DA PÁGINA DE LOGIN/REGISTRO */
-  body.login-page{display:flex;justify-content:center;align-items:center;background:#1b1b1b;} /* Centraliza o conteúdo e aplica fundo preto escuro */
-  
+  /* LOGIN/REGISTRO */
+  body.login-page{display:flex;justify-content:center;align-items:center;background:#1b1b1b;}
   .container{ 
-    background:#2c2c2c; /* Fundo cinza escuro da caixa */
-    padding:2rem; /* Espaçamento interno */
-    border-radius:15px; /* Cantos arredondados */
-    width:100%; /* Largura máxima da tela */
-    max-width:380px; /* Limite máximo da largura */
-    text-align:center; /* Centraliza textos */
-    transition: all 0.3s ease; /* Transição suave para hover/alterações */
-    color:#fff; /* Cor do texto branca */
-    
-    /* Borda neon rosa */
-    border: 2px solid #ff00ff; /* Borda rosa neon */
-    box-shadow: 0 0 10px #ff00ff, 0 0 20px #ff00ff, 0 0 30px #ff00ff; /* Efeito de brilho neon */
+    background:#2c2c2c;padding:2rem;border-radius:15px;width:100%;max-width:380px;text-align:center;color:#fff;
+    border:2px solid #ff00ff;box-shadow:0 0 10px #ff00ff,0 0 20px #ff00ff,0 0 30px #ff00ff;
   }
+  h2{margin-bottom:1rem;color:#fff;}
+  .input-field{margin:12px 0;text-align:left;}
+  .input-field label{font-size:0.9rem;color:#ccc;}
+  .input-field input,.input-field select{width:100%;padding:12px;margin-top:5px;border:1px solid #555;border-radius:10px;background:#1b1b1b;color:#fff;outline:none;transition:0.3s;}
+  .input-field input:focus,.input-field select:focus{border-color:#8e44ad;}
+  .btn{margin-top:15px;padding:12px;width:100%;background:#8e44ad;border:none;border-radius:10px;color:#fff;font-size:1rem;cursor:pointer;transition:0.3s;}
+  .btn:hover{background:#5e3370;}
+  .toggle{margin-top:1rem;font-size:0.9rem;color:#ccc;cursor:pointer;}
+  .toggle span{color:#ff00ff;font-weight:bold;}
+  .hidden{display:none;}
 
-  h2{margin-bottom:1rem;color:#fff;} /* Título dentro das caixas */
-
-  .input-field{margin:12px 0;text-align:left;} /* Espaçamento entre campos */
-  .input-field label{font-size:0.9rem;color:#ccc;} /* Estilo do label */
-  .input-field input{
-    width:100%; /* Largura total do campo */
-    padding:12px; /* Espaçamento interno */
-    margin-top:5px; /* Espaço entre label e input */
-    border:1px solid #555; /* Borda cinza escuro */
-    border-radius:10px; /* Cantos arredondados */
-    background:#1b1b1b; /* Fundo preto escuro */
-    color:#fff; /* Texto branco */
-    outline:none; /* Remove contorno padrão do focus */
-    transition:0.3s; /* Transição suave */
-  }
-  .input-field input:focus{border-color:#8e44ad;} /* Muda a borda para roxo escuro quando selecionado */
-
-  .btn{
-    margin-top:15px; /* Espaço acima do botão */
-    padding:12px; /* Espaço interno */
-    width:100%; /* Botão ocupa toda a largura */
-    background:#8e44ad; /* Cor de fundo roxo escuro */
-    border:none; /* Remove borda */
-    border-radius:10px; /* Cantos arredondados */
-    color:#fff; /* Texto branco */
-    font-size:1rem; /* Tamanho da fonte */
-    cursor:pointer; /* Cursor tipo ponteiro */
-    transition:0.3s; /* Suaviza mudança de cor */
-  }
-  .btn:hover{background:#5e3370;} /* Escurece botão no hover */
-
-  .toggle{margin-top:1rem;font-size:0.9rem;color:#ccc;cursor:pointer;} /* Texto para alternar login/registro */
-  .toggle span{color:#ff00ff;font-weight:bold;} /* Destaca "Registre-se" ou "Faça login" */
-  .hidden{display:none;} /* Classe para esconder elementos */
-
-  /* ESTILO DA PÁGINA DE PAINEL */
-  body.panel-page{display:flex;height:100%;background:#121212;color:#fff;} /* Página com fundo quase preto e texto branco */
+  /* PAINEL */
+  body.panel-page{display:flex;height:100%;background:#121212;color:#fff;}
+  .sidebar{width:220px;background:#000;padding:30px 20px;box-shadow:2px 0 10px rgba(0,0,0,0.5);display:flex;flex-direction:column;gap:15px;position:fixed;height:100%;}
+  .sidebar h3{margin-bottom:20px;color:#8e44ad;text-align:center;font-size:1.3rem;}
+  .sidebar button{padding:12px;border:none;border-radius:10px;cursor:pointer;background:#2c2c2c;color:#fff;font-weight:bold;font-size:1rem;transition:all 0.3s;box-shadow:0 4px 6px rgba(0,0,0,0.3);}
+  .sidebar button:hover{background:#8e44ad;transform:translateY(-2px);box-shadow:0 6px 12px rgba(0,0,0,0.5);}
+  .main{margin-left:220px;flex:1;padding:30px;display:flex;flex-direction:column;gap:20px;background:#1b1b1b;}
+  .main h2{color:#8e44ad;margin-bottom:15px;}
+  .planilha-card,.produto-card{background:#2c2c2c;padding:20px;border-radius:15px;box-shadow:0 4px 15px rgba(0,0,0,0.5);transition:transform 0.3s,box-shadow 0.3s;}
+  .planilha-card:hover,.produto-card:hover{transform:translateY(-5px);box-shadow:0 8px 25px rgba(0,0,0,0.7);}
+  .admin-actions,.cliente-actions{margin-top:15px;display:flex;gap:10px;}
+  .admin-actions button,.cliente-actions button{flex:1;padding:10px;border:none;border-radius:8px;cursor:pointer;background:#8e44ad;color:#fff;font-weight:bold;transition:0.3s;}
+  .admin-actions button:hover,.cliente-actions button:hover{background:#5e3370;}
   
-  .sidebar{
-    width:220px; /* Largura da barra lateral */
-    background:#000; /* Fundo preto */
-    padding:30px 20px; /* Espaço interno */
-    box-shadow:2px 0 10px rgba(0,0,0,0.5); /* Sombra lateral */
-    display:flex;flex-direction:column;gap:15px; /* Itens organizados em coluna com espaço */
-    position:fixed; /* Fixa a barra lateral */
-    height:100%; /* Altura total */
+  /* Estilos para relatórios */
+  .relatorio-card {
+    background: #2c2c2c;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    border-left: 4px solid #8e44ad;
   }
-
-  .sidebar h3{
-    margin-bottom:20px; /* Espaço abaixo do título */
-    color:#8e44ad; /* Cor roxo escuro */
-    text-align:center; /* Centraliza texto */
-    font-size:1.3rem; /* Tamanho do título */
+  .relatorio-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    font-weight: bold;
   }
-
-  .sidebar button{
-    padding:12px; /* Espaço interno */
-    border:none; /* Remove borda */
-    border-radius:10px; /* Cantos arredondados */
-    cursor:pointer; /* Cursor ponteiro */
-    background:#2c2c2c; /* Cor de fundo da barra lateral */
-    color:#fff; /* Texto branco */
-    font-weight:bold; /* Negrito */
-    font-size:1rem; /* Tamanho da fonte */
-    transition:all 0.3s; /* Transição suave */
-    box-shadow:0 4px 6px rgba(0,0,0,0.3); /* Sombra sutil */
+  .relatorio-detalhes {
+    font-size: 0.9rem;
+    color: #ccc;
   }
-  .sidebar button:hover{
-    background:#8e44ad; /* Muda para roxo escuro */
-    transform:translateY(-2px); /* Levanta botão */
-    box-shadow:0 6px 12px rgba(0,0,0,0.5); /* Sombra mais intensa */
+  .relatorio-total {
+    margin-top: 10px;
+    font-weight: bold;
+    text-align: right;
+    color: #8e44ad;
   }
-
-  .main{
-    margin-left:220px; /* Espaço para sidebar */
-    flex:1;
-    padding:30px;
-    display:flex;
-    flex-direction:column;
-    gap:20px;
-    background:#1b1b1b; /* Fundo da área principal */
+  .filtros {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
   }
-
-  .main h2{color:#8e44ad;margin-bottom:15px;} /* Título roxo escuro na área principal */
-
-  .planilha-card{
-    background:#2c2c2c; /* Fundo do card */
-    padding:20px; /* Espaço interno */
-    border-radius:15px; /* Cantos arredondados */
-    box-shadow:0 4px 15px rgba(0,0,0,0.5); /* Sombra */
-    transition:transform 0.3s, box-shadow 0.3s; /* Suaviza hover */
+  .filtros select, .filtros input {
+    padding: 8px;
+    border-radius: 5px;
+    background: #2c2c2c;
+    color: white;
+    border: 1px solid #555;
   }
-  .planilha-card:hover{
-    transform:translateY(-5px); /* Eleva card no hover */
-    box-shadow:0 8px 25px rgba(0,0,0,0.7); /* Sombra mais intensa */
+  .produto-info {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
   }
 </style>
 </head>
 <body class="login-page">
 
-  <!-- LOGIN -->
-  <div class="container" id="loginForm">
-    <h2>Login</h2>
-    <div class="input-field">
-      <label for="loginEmail">Email</label>
-      <input type="email" id="loginEmail" placeholder="Digite seu email">
-    </div>
-    <div class="input-field">
-      <label for="loginSenha">Senha</label>
-      <input type="password" id="loginSenha" placeholder="Digite sua senha">
-    </div>
-    <button class="btn" onclick="login()">Entrar</button> <!-- Chama função login -->
-    <p class="toggle">Não tem conta? <span onclick="showRegister()">Registre-se</span></p> <!-- Alterna para registro -->
+<!-- LOGIN -->
+<div class="container" id="loginForm">
+  <h2>Login</h2>
+  <div class="input-field">
+    <label for="loginEmail">Email</label>
+    <input type="email" id="loginEmail" placeholder="Digite seu email">
   </div>
-
-  <!-- REGISTRO -->
-  <div class="container hidden" id="registerForm">
-    <h2>Registrar</h2>
-    <div class="input-field">
-      <label for="regEmail">Email</label>
-      <input type="email" id="regEmail" placeholder="Digite seu email">
-    </div>
-    <div class="input-field">
-      <label for="regSenha">Senha</label>
-      <input type="password" id="regSenha" placeholder="Digite sua senha">
-    </div>
-    <div class="input-field">
-      <label for="regConfirma">Confirmar Senha</label>
-      <input type="password" id="regConfirma" placeholder="Confirme sua senha">
-    </div>
-    <button class="btn" onclick="register()">Registrar</button> <!-- Chama função registrar -->
-    <p class="toggle">Já tem conta? <span onclick="showLogin()">Faça login</span></p> <!-- Alterna para login -->
+  <div class="input-field">
+    <label for="loginSenha">Senha</label>
+    <input type="password" id="loginSenha" placeholder="Digite sua senha">
   </div>
+  <button class="btn" onclick="login()">Entrar</button>
+  <p class="toggle">Não tem conta? <span onclick="showRegister()">Registre-se</span></p>
+</div>
 
-  <!-- PAINEL -->
-  <div class="panel hidden" id="panelPage">
-    <div class="sidebar">
-      <h3>Painel</h3>
-      <button onclick="showPlanilha(1)">Planilha 1</button>
-      <button onclick="showPlanilha(2)">Planilha 2</button>
-      <button onclick="showPlanilha(3)">Planilha 3</button>
-    </div>
-    <div class="main" id="mainContent">
-      <h2>Bem-vindo!</h2>
-      <p>Escolha uma planilha na coluna à esquerda.</p>
-    </div>
+<!-- REGISTRO -->
+<div class="container hidden" id="registerForm">
+  <h2>Registrar</h2>
+  <div class="input-field">
+    <label for="regEmail">Email</label>
+    <input type="email" id="regEmail" placeholder="Digite seu email">
   </div>
+  <div class="input-field">
+    <label for="regSenha">Senha</label>
+    <input type="password" id="regSenha" placeholder="Digite sua senha">
+  </div>
+  <div class="input-field">
+    <label for="regRole">Tipo de usuário</label>
+    <select id="regRole">
+      <option value="admin">Admin</option>
+      <option value="funcionario">Funcionário</option>
+      <option value="cliente">Cliente</option>
+    </select>
+  </div>
+  <button class="btn" onclick="register()">Registrar</button>
+  <p class="toggle">Já tem conta? <span onclick="showLogin()">Faça login</span></p>
+</div>
 
-  <script>
-    // Mostra formulário de registro e esconde login
-    function showRegister() {
-      document.getElementById("loginForm").classList.add("hidden");
-      document.getElementById("registerForm").classList.remove("hidden");
-    }
+<!-- PAINEL -->
+<div class="hidden" id="panelPage">
+  <div class="sidebar">
+    <h3>Painel</h3>
+    <button onclick="showSection('home')">Início</button>
+    <button onclick="showSection('loja')">Loja</button>
+    <button id="btnCarrinho" onclick="showSection('carrinho')">Carrinho</button>
+    <button id="btnRelatorios" onclick="showSection('relatorios')">Relatórios</button>
+    <button onclick="logout()">Sair</button>
+  </div>
+  <div class="main" id="mainContent">
+    <h2>Bem-vindo!</h2>
+    <p>Escolha uma opção no menu à esquerda.</p>
+  </div>
+</div>
 
-    // Mostra formulário de login e esconde registro
-    function showLogin() {
-      document.getElementById("registerForm").classList.add("hidden");
-      document.getElementById("loginForm").classList.remove("hidden");
-    }
+<script>
+let currentUser = null;
+let produtos = [
+  { id: 1, nome: "Produto 1", preco: 29.90 },
+  { id: 2, nome: "Produto 2", preco: 49.90 },
+  { id: 3, nome: "Produto 3", preco: 79.90 },
+  { id: 4, nome: "Produto 4", preco: 99.90 },
+  { id: 5, nome: "Produto 5", preco: 19.90 }
+];
+let carrinho = []; // carrinho do cliente
 
-    // Função para registrar usuário
-    function register() {
-      let email = document.getElementById("regEmail").value;
-      let senha = document.getElementById("regSenha").value;
-      let confirma = document.getElementById("regConfirma").value;
+// Alternar telas
+function showRegister(){
+  document.getElementById("loginForm").classList.add("hidden");
+  document.getElementById("registerForm").classList.remove("hidden");
+}
+function showLogin(){
+  document.getElementById("registerForm").classList.add("hidden");
+  document.getElementById("loginForm").classList.remove("hidden");
+}
 
-      if(!email || !senha || !confirma){alert("Preencha todos os campos!"); return;} // Valida campos vazios
-      if(!email.includes("@")){alert("Digite um email válido!"); return;} // Valida email com @
-      if(senha.length < 6){alert("A senha deve ter pelo menos 6 caracteres!"); return;} // Valida tamanho mínimo
-      if(senha!==confirma){alert("As senhas não conferem!"); return;} // Confirma senha
+// Cadastro
+function register(){
+  const email=document.getElementById("regEmail").value;
+  const senha=document.getElementById("regSenha").value;
+  const role=document.getElementById("regRole").value;
+  if(!email || !senha){alert("Preencha todos os campos!");return;}
+  let users=JSON.parse(localStorage.getItem("users")||"[]");
+  if(users.find(u=>u.email===email)){alert("Usuário já existe!");return;}
+  users.push({email,senha,role});
+  localStorage.setItem("users",JSON.stringify(users));
+  alert("Cadastro realizado com sucesso!");
+  showLogin();
+}
 
-      // Armazena email e senha no localStorage
-      localStorage.setItem("userEmail",email);
-      localStorage.setItem("userSenha",senha);
-      alert("Conta criada com sucesso!");
-      showLogin(); // Volta para login
-    }
+// Login
+function login(){
+  const email=document.getElementById("loginEmail").value;
+  const senha=document.getElementById("loginSenha").value;
+  let users=JSON.parse(localStorage.getItem("users")||"[]");
+  const user=users.find(u=>u.email===email && u.senha===senha);
+  if(!user){alert("Email ou senha inválidos!");return;}
+  currentUser=user;
+  carrinho = []; // limpa o carrinho ao logar
+  document.body.classList.remove("login-page");
+  document.body.classList.add("panel-page");
+  document.getElementById("loginForm").classList.add("hidden");
+  document.getElementById("registerForm").classList.add("hidden");
+  document.getElementById("panelPage").classList.remove("hidden");
+  atualizarMenu();
+  showSection("home");
+}
 
-    // Função de login
-    function login() {
-      let email = document.getElementById("loginEmail").value;
-      let senha = document.getElementById("loginSenha").value;
-      if(!email || !senha){alert("Preencha todos os campos!");return;} // Valida campos
-      const storedEmail = localStorage.getItem("userEmail");
-      const storedSenha = localStorage.getItem("userSenha");
-      if(email===storedEmail && senha===storedSenha){
-        document.body.classList.remove("login-page");
-        document.body.classList.add("panel-page"); // Mostra página de painel
-        document.getElementById("loginForm").classList.add("hidden");
-        document.getElementById("panelPage").classList.remove("hidden");
-      } else {alert("Email ou senha incorretos!");}
-    }
+// Logout
+function logout(){
+  currentUser=null;
+  carrinho=[];
+  document.body.classList.add("login-page");
+  document.body.classList.remove("panel-page");
+  document.getElementById("panelPage").classList.add("hidden");
+  document.getElementById("loginForm").classList.remove("hidden");
+}
 
-    // Exibe conteúdo da planilha selecionada
-    function showPlanilha(num){
-      const main=document.getElementById("mainContent");
-      main.innerHTML=`<h2>Planilha ${num}</h2>
-      <div class="planilha-card"><p>Conteúdo da Planilha ${num} aqui.</p></div>`;
+// Atualizar menu conforme tipo de usuário
+function atualizarMenu(){
+  const btnCarrinho = document.getElementById("btnCarrinho");
+  const btnRelatorios = document.getElementById("btnRelatorios");
+  if(currentUser.role==="cliente"){
+    btnCarrinho.style.display="block";
+    btnRelatorios.style.display="none";
+  } else if(currentUser.role==="admin"){
+    btnCarrinho.style.display="none";
+    btnRelatorios.style.display="block";
+  } else {
+    btnCarrinho.style.display="none";
+    btnRelatorios.style.display="none";
+  }
+}
 
-      const email = localStorage.getItem("userEmail");
+// Registrar uma compra no sistema
+function registrarCompra(compra) {
+  let compras = JSON.parse(localStorage.getItem("compras") || "[]");
+  compras.push(compra);
+  localStorage.setItem("compras", JSON.stringify(compras));
+}
 
-      if(email === "admin@gmail.com"){
-        const adminMensage = document.createElement("p");
-        adminMensage.textContent = "Sou Admin";
-        main.appendChild(adminMensage);
+// Calcular total do carrinho
+function calcularTotal() {
+  return carrinho.reduce((total, item) => total + item.preco, 0).toFixed(2);
+}
+
+// Seções do painel
+function showSection(section){
+  const main=document.getElementById("mainContent");
+  main.innerHTML="";
+  if(section==="home"){
+    main.innerHTML=`<h2>Bem-vindo, ${currentUser.role}</h2>`;
+  }
+  if(section==="loja"){
+    main.innerHTML="<h2>Loja</h2>";
+    produtos.forEach(prod=>{
+      const div=document.createElement("div");
+      div.className="produto-card";
+      div.innerHTML=`
+        <p><strong>${prod.nome}</strong></p>
+        <p>R$ ${prod.preco.toFixed(2)}</p>
+      `;
+      if(currentUser.role==="cliente"){
+        const btn=document.createElement("button");
+        btn.textContent="Adicionar ao carrinho";
+        btn.onclick=()=>{
+          carrinho.push(prod);
+          alert(`${prod.nome} adicionado ao carrinho!`);
+        };
+        div.appendChild(btn);
       }
+      main.appendChild(div);
+    });
+  }
+  if(section==="carrinho" && currentUser.role==="cliente"){
+    main.innerHTML="<h2>Carrinho</h2>";
+    if(carrinho.length===0){
+      main.innerHTML+="<p>Seu carrinho está vazio.</p>";
+    } else {
+      carrinho.forEach((item,i)=>{
+        const div=document.createElement("div");
+        div.className="produto-card";
+        div.innerHTML=`
+          <div class="produto-info">
+            <span>${item.nome}</span>
+            <span>R$ ${item.preco.toFixed(2)}</span>
+          </div>
+        `;
+        const btnRemover=document.createElement("button");
+        btnRemover.textContent="Remover";
+        btnRemover.onclick=()=>{
+          carrinho.splice(i,1);
+          showSection("carrinho");
+        };
+        div.appendChild(btnRemover);
+        main.appendChild(div);
+      });
+      
+      const totalDiv = document.createElement("div");
+      totalDiv.className = "produto-card";
+      totalDiv.innerHTML = `<p><strong>Total: R$ ${calcularTotal()}</strong></p>`;
+      main.appendChild(totalDiv);
+      
+      const btnFinalizar=document.createElement("button");
+      btnFinalizar.className="btn";
+      btnFinalizar.textContent="Finalizar Compra";
+      btnFinalizar.onclick=()=>{
+        // Registrar a compra
+        const compra = {
+          id: Date.now(),
+          cliente: currentUser.email,
+          data: new Date().toLocaleString('pt-BR'),
+          itens: [...carrinho],
+          total: calcularTotal()
+        };
+        
+        registrarCompra(compra);
+        alert("Compra finalizada com sucesso!");
+        carrinho=[];
+        showSection("carrinho");
+      };
+      main.appendChild(btnFinalizar);
     }
-  </script>
+  }
+  if(section==="relatorios" && currentUser.role==="admin"){
+    main.innerHTML="<h2>Relatórios de Compras</h2>";
+    
+    // Adicionar filtros
+    const filtrosDiv = document.createElement("div");
+    filtrosDiv.className = "filtros";
+    filtrosDiv.innerHTML = `
+      <select id="filtroCliente">
+        <option value="">Todos os clientes</option>
+      </select>
+      <input type="date" id="filtroDataInicio" placeholder="Data início">
+      <input type="date" id="filtroDataFim" placeholder="Data fim">
+      <button class="btn" onclick="filtrarRelatorios()">Filtrar</button>
+      <button class="btn" onclick="limparFiltros()">Limpar</button>
+    `;
+    main.appendChild(filtrosDiv);
+    
+    // Carregar clientes para o filtro
+    carregarClientesFiltro();
+    
+    // Exibir relatórios
+    exibirRelatorios();
+  }
+}
+
+// Carregar clientes para o filtro
+function carregarClientesFiltro() {
+  const compras = JSON.parse(localStorage.getItem("compras") || "[]");
+  const clientes = [...new Set(compras.map(compra => compra.cliente))];
+  
+  const selectCliente = document.getElementById("filtroCliente");
+  clientes.forEach(cliente => {
+    const option = document.createElement("option");
+    option.value = cliente;
+    option.textContent = cliente;
+    selectCliente.appendChild(option);
+  });
+}
+
+// Exibir relatórios
+function exibirRelatorios() {
+  const main = document.getElementById("mainContent");
+  const compras = JSON.parse(localStorage.getItem("compras") || "[]");
+  
+  if (compras.length === 0) {
+    main.innerHTML += "<p>Nenhuma compra registrada ainda.</p>";
+    return;
+  }
+  
+  // Aplicar filtros
+  const clienteFiltro = document.getElementById("filtroCliente").value;
+  const dataInicio = document.getElementById("filtroDataInicio").value;
+  const dataFim = document.getElementById("filtroDataFim").value;
+  
+  let comprasFiltradas = compras;
+  
+  if (clienteFiltro) {
+    comprasFiltradas = comprasFiltradas.filter(compra => compra.cliente === clienteFiltro);
+  }
+  
+  if (dataInicio) {
+    comprasFiltradas = comprasFiltradas.filter(compra => {
+      const dataCompra = new Date(compra.data.split(',')[0].split('/').reverse().join('-'));
+      const dataInicioFiltro = new Date(dataInicio);
+      return dataCompra >= dataInicioFiltro;
+    });
+  }
+  
+  if (dataFim) {
+    comprasFiltradas = comprasFiltradas.filter(compra => {
+      const dataCompra = new Date(compra.data.split(',')[0].split('/').reverse().join('-'));
+      const dataFimFiltro = new Date(dataFim);
+      return dataCompra <= dataFimFiltro;
+    });
+  }
+  
+  // Exibir compras filtradas
+  comprasFiltradas.forEach(compra => {
+    const div = document.createElement("div");
+    div.className = "relatorio-card";
+    
+    let itensHTML = "";
+    compra.itens.forEach(item => {
+      itensHTML += `<div class="produto-info"><span>${item.nome}</span><span>R$ ${item.preco.toFixed(2)}</span></div>`;
+    });
+    
+    div.innerHTML = `
+      <div class="relatorio-header">
+        <span>Compra #${compra.id}</span>
+        <span>${compra.data}</span>
+      </div>
+      <div class="relatorio-detalhes">
+        <p><strong>Cliente:</strong> ${compra.cliente}</p>
+        <p><strong>Itens:</strong></p>
+        ${itensHTML}
+      </div>
+      <div class="relatorio-total">
+        Total: R$ ${compra.total}
+      </div>
+    `;
+    main.appendChild(div);
+  });
+  
+  // Exibir estatísticas
+  const totalVendas = comprasFiltradas.reduce((total, compra) => total + parseFloat(compra.total), 0);
+  const totalCompras = comprasFiltradas.length;
+  
+  const statsDiv = document.createElement("div");
+  statsDiv.className = "produto-card";
+  statsDiv.innerHTML = `
+    <h3>Estatísticas</h3>
+    <p>Total de vendas: R$ ${totalVendas.toFixed(2)}</p>
+    <p>Número de compras: ${totalCompras}</p>
+    <p>Ticket médio: R$ ${totalCompras > 0 ? (totalVendas / totalCompras).toFixed(2) : '0.00'}</p>
+  `;
+  main.appendChild(statsDiv);
+}
+
+// Filtrar relatórios
+function filtrarRelatorios() {
+  showSection("relatorios");
+}
+
+// Limpar filtros
+function limparFiltros() {
+  document.getElementById("filtroCliente").value = "";
+  document.getElementById("filtroDataInicio").value = "";
+  document.getElementById("filtroDataFim").value = "";
+  showSection("relatorios");
+}
+</script>
+
 </body>
 </html>
