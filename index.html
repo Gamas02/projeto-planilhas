@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Planilha Editável</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>Planilha Editável de Clientes</h1>
+
+  <div class="container">
+    <!-- Formulário de cadastro -->
+    <div class="form-cadastro">
+      <input type="text" id="nome" placeholder="Nome" required>
+      <input type="email" id="email" placeholder="Email" required>
+      <input type="text" id="produto" placeholder="Produto" required>
+      <input type="text" id="estado" placeholder="Estado de Pagamento" required>
+      <input type="date" id="dataInicial" placeholder="Data Inicial" required>
+      <input type="date" id="dataFinal" placeholder="Data Final" required>
+      <button id="btnAdicionar">Adicionar Cliente</button>
+    </div>
+
+    <!-- Planilha -->
+    <table id="tabela">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nome</th>
+          <th>Email</th>
+          <th>Produto</th>
+          <th>Estado Pagamento</th>
+          <th>Data Inicial</th>
+          <th>Data Final</th>
+        </tr>
+      </thead>
+      <tbody contenteditable="true">
+        <tr>
+          <td>1</td>
+          <td>Matheus</td>
+          <td>matheus@email.com</td>
+          <td>Lapiz</td>
+          <td>Pago</td>
+          <td>2025-01-01</td>
+          <td>2025-12-31</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Botões -->
+    <div class="botoes">
+        <button id="btnExportar">💾 Salvar CSV</button>
+
+        <label for="inputCSV" class="file-label">📂 Escolher CSV</label>
+        <input type="file" id="inputCSV" accept=".csv">
+
+        <button id="btnImportar">🔄 Atualizar Planilha</button>
+    </div>
+
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

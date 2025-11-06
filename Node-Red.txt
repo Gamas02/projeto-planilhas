@@ -1,0 +1,124 @@
+[
+    {
+        "id": "d94c0ba318d5c031",
+        "type": "tab",
+        "label": "Cadastro Clientes",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "6d834354ae44be4d",
+        "type": "http in",
+        "z": "d94c0ba318d5c031",
+        "name": "Recebe POST /clientes",
+        "url": "/clientes",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 160,
+        "y": 140,
+        "wires": [
+            [
+                "e9618b0b23aba38b",
+                "3b6b7b11e029d4f1"
+            ]
+        ]
+    },
+    {
+        "id": "e9618b0b23aba38b",
+        "type": "json",
+        "z": "d94c0ba318d5c031",
+        "name": "Parse JSON",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 380,
+        "y": 140,
+        "wires": [
+            [
+                "2ee60d75f15ad60e"
+            ]
+        ]
+    },
+    {
+        "id": "2ee60d75f15ad60e",
+        "type": "function",
+        "z": "d94c0ba318d5c031",
+        "name": "Monta INSERT MySQL",
+        "func": "// Garante compatibilidade com diferentes formatos\nlet dados = msg.payload;\n\n// Alguns setups do Node-RED colocam o JSON em msg.req.body\nif (msg.req && msg.req.body) {\n    dados = msg.req.body;\n}\n\n// Mostra no debug pra confirmar\nnode.warn(dados);\n\n// Verifica se todos os campos estão presentes\nif (!dados.nome || !dados.email || !dados.produto || !dados.estado_pagamento || !dados.data_inicial || !dados.data_final) {\n    node.error(\"Campos faltando no JSON recebido\", msg);\n    return null;\n}\n\n// Monta a query SQL\nmsg.topic = `\nINSERT INTO cliente (nome, email, produto, estado, data_inicial, data_final)\nVALUES ('${dados.nome}', '${dados.email}', '${dados.produto}', '${dados.estado_pagamento}', '${dados.data_inicial}', '${dados.data_final}');\n`;\n\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 600,
+        "y": 140,
+        "wires": [
+            [
+                "86c79aa4c212a173",
+                "533094b8c85eee79"
+            ]
+        ]
+    },
+    {
+        "id": "93985602e2af15dd",
+        "type": "http response",
+        "z": "d94c0ba318d5c031",
+        "name": "Retorna sucesso",
+        "statusCode": "200",
+        "headers": {},
+        "x": 1010,
+        "y": 140,
+        "wires": []
+    },
+    {
+        "id": "3b6b7b11e029d4f1",
+        "type": "debug",
+        "z": "d94c0ba318d5c031",
+        "name": "Ver JSON recebido",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 370,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "533094b8c85eee79",
+        "type": "mysql",
+        "z": "d94c0ba318d5c031",
+        "mydb": "c04a5a96b24f2c3d",
+        "name": "",
+        "x": 820,
+        "y": 140,
+        "wires": [
+            [
+                "93985602e2af15dd"
+            ]
+        ]
+    },
+    {
+        "id": "c04a5a96b24f2c3d",
+        "type": "MySQLdatabase",
+        "name": "empresa",
+        "host": "localhost",
+        "port": "3306",
+        "db": "empresa",
+        "tz": "",
+        "charset": "UTF8"
+    },
+    {
+        "id": "3279c407dd62d8e2",
+        "type": "global-config",
+        "env": [],
+        "modules": {
+            "node-red-node-mysql": "2.0.0"
+        }
+    }
+]

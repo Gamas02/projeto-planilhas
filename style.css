@@ -1,0 +1,259 @@
+/* style.css — Visual moderno para a planilha */
+
+/* --- Variáveis de tema --- */
+:root{
+  --bg: #0f1724;              /* fundo da página */
+  --card: rgba(255,255,255,0.04);
+  --glass: rgba(255,255,255,0.04);
+  --muted: #9aa4b2;
+  --accent: linear-gradient(90deg,#6ee7b7 0%, #60a5fa 100%);
+  --primary: #2563eb;
+  --primary-600: #1e40af;
+  --success: #10b981;
+  --danger: #ef4444;
+  --glass-border: rgba(255,255,255,0.06);
+  --radius: 12px;
+  --shadow: 0 8px 30px rgba(2,6,23,0.6);
+  --glass-shadow: 0 6px 18px rgba(2,6,23,0.55);
+  --max-width: 1100px;
+}
+
+/* --- Reset e base --- */
+* { box-sizing: border-box; }
+html,body { height: 100%; }
+body {
+  margin: 0;
+  font-family: Inter, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  background: radial-gradient(1200px 500px at 10% 10%, rgba(96,165,250,0.06), transparent 10%),
+              radial-gradient(800px 400px at 90% 80%, rgba(110,231,183,0.03), transparent 10%),
+              var(--bg);
+  color: #e6eef8;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  padding: 40px 20px;
+  display: flex;
+  justify-content: center;
+}
+
+/* --- Container principal --- */
+.container {
+  width: 100%;
+  max-width: var(--max-width);
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  border-radius: calc(var(--radius) + 4px);
+  padding: 22px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(6px) saturate(120%);
+}
+
+/* Título */
+h1 {
+  margin: 0 0 18px 0;
+  font-size: 20px;
+  letter-spacing: -0.2px;
+  color: #f8fafc;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+h1::before{
+  content: "";
+  width: 44px;
+  height: 6px;
+  background: var(--accent);
+  border-radius: 6px;
+  box-shadow: 0 6px 20px rgba(37,99,235,0.12);
+}
+
+/* --- Formulário de cadastro --- */
+.form-cadastro {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.form-cadastro input[type="text"],
+.form-cadastro input[type="email"],
+.form-cadastro input[type="date"],
+.form-cadastro input[type="number"]{
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.04);
+  padding: 10px 12px;
+  border-radius: 10px;
+  color: #e6eef8;
+  outline: none;
+  transition: transform .08s ease, box-shadow .12s ease, border-color .12s ease;
+  font-size: 14px;
+}
+
+.form-cadastro input::placeholder{
+  color: var(--muted);
+  opacity: 0.9;
+}
+
+/* foco bonito */
+.form-cadastro input:focus{
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(37,99,235,0.08);
+  border-color: rgba(96,165,250,0.9);
+}
+
+/* Botões do formulário */
+.form-cadastro button{
+  grid-column: span 1;
+  background: linear-gradient(90deg,#60a5fa,#6ee7b7);
+  border: none;
+  color: #04263b;
+  padding: 11px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  box-shadow: var(--glass-shadow);
+  transition: transform .08s ease, opacity .12s;
+}
+.form-cadastro button:hover{ transform: translateY(-3px); opacity: .98; }
+
+/* --- Área da tabela --- */
+.table-wrap{
+  width: 100%;
+  overflow: auto;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.03);
+  background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));
+}
+
+/* tabela */
+table {
+  width: 100%;
+  min-width: 800px;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+thead th {
+  position: sticky;
+  top: 0;
+  background: linear-gradient(180deg, rgba(2,6,23,0.7), rgba(2,6,23,0.6));
+  color: #cfe9ff;
+  text-align: left;
+  padding: 12px 16px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+
+tbody td {
+  padding: 12px 16px;
+  border-bottom: 1px dashed rgba(255,255,255,0.02);
+  vertical-align: middle;
+  color: #e6eef8;
+}
+
+/* zebra suave */
+tbody tr:nth-child(odd){
+  background: linear-gradient(90deg, rgba(255,255,255,0.00), rgba(255,255,255,0.001));
+}
+tbody tr:hover{
+  background: linear-gradient(90deg, rgba(96,165,250,0.03), rgba(110,231,183,0.02));
+}
+
+/* células editáveis: visual ao focar (precisa tornar td focusable via JS opcional) */
+tbody td:focus{
+  outline: none;
+  box-shadow: inset 0 0 0 2px rgba(96,165,250,0.14);
+  background: rgba(96,165,250,0.03);
+  transform: translateY(-1px);
+}
+
+/* ID column */
+thead th:first-child, tbody td:first-child { width: 70px; text-align: center; }
+
+/* responsividade */
+@media (max-width: 880px){
+  :root{ --max-width: 980px; }
+  table { min-width: 700px; }
+}
+@media (max-width: 640px){
+  .form-cadastro { grid-template-columns: repeat(1, 1fr); }
+  table { min-width: 600px; font-size: 13px; }
+}
+
+/* --- Área de botões inferiores --- */
+.botoes {
+  margin-top: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+/* botão principal */
+button#btnExportar {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.06);
+  color: #e6eef8;
+  padding: 10px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: transform .08s, background .12s;
+}
+button#btnExportar:hover{
+  transform: translateY(-3px);
+  background: linear-gradient(90deg,#0ea5b0 0%, rgba(96,165,250,0.06) 100%);
+  border-color: rgba(96,165,250,0.18);
+  color: #04263b;
+}
+
+/* import file (escondendo o input e estilizando) */
+input[type="file"]{
+  display: none;
+}
+label.file-label{
+  display: inline-block;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.04);
+  background: rgba(255,255,255,0.02);
+  cursor: pointer;
+  font-weight: 600;
+  color: #dbeafe;
+}
+label.file-label:hover{ transform: translateY(-2px); }
+
+/* botão importar */
+button#btnImportar{
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.06);
+  padding: 10px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  color: #e6eef8;
+  font-weight: 700;
+}
+button#btnImportar:hover{
+  background: rgba(255,255,255,0.02);
+  transform: translateY(-2px);
+}
+
+/* --- Mensagens pequenas e helpers --- */
+.small {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 8px;
+  text-align: left;
+}
+
+/* --- Footer spacing --- */
+.footer-space { height: 8px; }
+
+/* --- Pequeno ajuste visual para inputs date --- */
+input[type="date"] {
+  padding: 9px 12px;
+}
+
+/* --- Fim do style --- */
