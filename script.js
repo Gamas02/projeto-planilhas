@@ -24,34 +24,32 @@ document.addEventListener("DOMContentLoaded", () => {
 
     novaLinha.innerHTML = `
       <td>${id}</td>
-      <td>${nome}</td>
-      <td>${email}</td>
-      <td>${produto}</td>
-      <td>${estado}</td>
-      <td>${dataInicial}</td>
-      <td>${dataFinal}</td>
+      <td contenteditable="true">${nome}</td>
+      <td contenteditable="true">${email}</td>
+      <td contenteditable="true">${produto}</td>
+      <td contenteditable="true">${estado}</td>
+      <td contenteditable="true">${dataInicial}</td>
+      <td contenteditable="true">${dataFinal}</td>
     `;
     tabela.appendChild(novaLinha);
 
-    // 📨 Enviar JSON para o backend
+    // 📨 Enviar JSON para o backend (inserção)
     try {
       const resposta = await fetch("http://127.0.0.1:1880/clientes", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           nome,
           email,
           produto,
           estado_pagamento: estado,
           data_inicial: dataInicial,
-          data_final: dataFinal
-        })
+          data_final: dataFinal,
+        }),
       });
 
       const data = await resposta.json();
-      console.log("Resposta do backend:", data);
+      console.log("Cliente cadastrado:", data);
     } catch (erro) {
       console.error("Erro ao enviar pro servidor:", erro);
     }
@@ -61,9 +59,9 @@ document.addEventListener("DOMContentLoaded", () => {
   btnExportar.addEventListener("click", () => {
     let csv = "";
     const linhas = document.querySelectorAll("#tabela tr");
-    linhas.forEach(linha => {
+    linhas.forEach((linha) => {
       const colunas = linha.querySelectorAll("th, td");
-      const dados = Array.from(colunas).map(td => `"${td.textContent}"`);
+      const dados = Array.from(colunas).map((td) => `"${td.textContent}"`);
       csv += dados.join(",") + "\n";
     });
 
@@ -74,8 +72,8 @@ document.addEventListener("DOMContentLoaded", () => {
     link.click();
   });
 
-  // 📂 Importar CSV e atualizar tabela
-  btnImportar.addEventListener("click", () => {
+  // Importar CSV e atualizar tabela + banco
+  btnImportar.addEventListener("click", async () => {
     const arquivo = inputCSV.files[0];
     if (!arquivo) {
       alert("Escolha um arquivo CSV primeiro!");
@@ -83,73 +81,119 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     const leitor = new FileReader();
-    leitor.onload = (e) => {
+    leitor.onload = async (e) => {
       const conteudo = e.target.result;
-      const linhas = conteudo.split("\n").filter(l => l.trim() !== "");
+      const linhas = conteudo.split("\n").filter((l) => l.trim() !== "");
       tabela.innerHTML = ""; // limpa tabela atual
+      const clientes = [];
 
       linhas.slice(1).forEach((linha, index) => {
-        const colunas = linha.split(",").map(c => c.replace(/"/g, ""));
+        const colunas = linha.split(",").map((c) => c.replace(/"/g, ""));
         if (colunas.length >= 7) {
           const tr = document.createElement("tr");
           tr.innerHTML = `
-            <td>${index + 1}</td>
-            <td>${colunas[1]}</td>
-            <td>${colunas[2]}</td>
-            <td>${colunas[3]}</td>
-            <td>${colunas[4]}</td>
-            <td>${colunas[5]}</td>
-            <td>${colunas[6]}</td>
+            <td>${colunas[0] || index + 1}</td>
+            <td contenteditable="true">${colunas[1]}</td>
+            <td contenteditable="true">${colunas[2]}</td>
+            <td contenteditable="true">${colunas[3]}</td>
+            <td contenteditable="true">${colunas[4]}</td>
+            <td contenteditable="true">${colunas[5]}</td>
+            <td contenteditable="true">${colunas[6]}</td>
           `;
           tabela.appendChild(tr);
+
+          clientes.push({
+            id_cliente: colunas[0] || index + 1,
+            nome: colunas[1],
+            email: colunas[2],
+            produto: colunas[3],
+            estado_pagamento: colunas[4],
+            data_inicial: colunas[5],
+            data_final: colunas[6],
+          });
         }
       });
+
+      // Enviar tudo para o backend
+      try {
+        await fetch("http://127.0.0.1:1880/clientes/sincronizar", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(clientes),
+        });
+        console.log("Banco sincronizado com CSV!");
+      } catch (erro) {
+        console.error("Erro ao sincronizar banco:", erro);
+      }
     };
     leitor.readAsText(arquivo);
   });
 
-// 🎨 Atualiza automaticamente o estado e aplica cores conforme a data
-function atualizarEstados() {
-  const hoje = new Date();
+  //  Atualizar banco ao editar uma célula
+  tabela.addEventListener("blur", async (e) => {
+    const celula = e.target;
+    const linha = celula.closest("tr");
+    if (!linha) return;
 
-  tabela.querySelectorAll("tr").forEach(linha => {
-    const celEstado = linha.children[4];
-    const celDataFinal = linha.children[6];
+    const dados = {
+      id_cliente: linha.children[0].textContent,
+      nome: linha.children[1].textContent,
+      email: linha.children[2].textContent,
+      produto: linha.children[3].textContent,
+      estado_pagamento: linha.children[4].textContent,
+      data_inicial: linha.children[5].textContent,
+      data_final: linha.children[6].textContent,
+    };
 
-    if (!celEstado || !celDataFinal) return;
-
-    const estado = celEstado.textContent.trim().toLowerCase();
-    const dataTexto = celDataFinal.textContent.trim().replace(/"/g, "");
-    const dataFinal = new Date(dataTexto);
-
-    // 🕒 Se a data for inválida, ignora
-    if (isNaN(dataFinal)) return;
-
-    // 🔄 Verifica se deve mudar o estado automaticamente
-    if (estado === "pendente" && hoje > dataFinal) {
-      celEstado.textContent = "Atrasado";
+    try {
+      await fetch("http://127.0.0.1:1880/clientes/atualizar", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(dados),
+      });
+      console.log("Cliente atualizado:", dados.nome);
+    } catch (erro) {
+      console.error("Erro ao atualizar cliente:", erro);
     }
+  }, true);
 
-    // 🎨 Aplica cor de acordo com o estado atual
-    const novoEstado = celEstado.textContent.trim().toLowerCase();
-    celEstado.style.fontWeight = "bold";
+  //  Atualiza automaticamente o estado e aplica cores conforme a data/estado
+  function atualizarEstados() {
+    const hoje = new Date();
 
-    if (novoEstado === "pago") {
-      celEstado.style.color = "green";
-    } else if (novoEstado === "pendente") {
-      celEstado.style.color = "orange";
-    } else if (novoEstado === "atrasado") {
-      celEstado.style.color = "red";
-    } else {
-      celEstado.style.color = "black";
-      celEstado.style.fontWeight = "normal";
-    }
-  });
-}
+    tabela.querySelectorAll("tr").forEach((linha) => {
+      const celEstado = linha.children[4];
+      const celDataFinal = linha.children[6];
 
-// ⏰ Atualiza a cada 3 segundos
-setInterval(atualizarEstados, 3000);
+      if (!celEstado || !celDataFinal) return;
 
-// ⚡ E também atualiza na primeira renderização
-atualizarEstados();
+      const estado = celEstado.textContent.trim().toLowerCase();
+      const dataTexto = celDataFinal.textContent.trim().replace(/"/g, "");
+      const dataFinal = new Date(dataTexto);
+
+      if (isNaN(dataFinal)) return;
+
+      if (estado === "pendente" && hoje > dataFinal) {
+        celEstado.textContent = "Atrasado";
+      }
+
+      const novoEstado = celEstado.textContent.trim().toLowerCase();
+      celEstado.style.fontWeight = "bold";
+
+      if (novoEstado === "pago") {
+        celEstado.style.color = "green";
+      } else if (novoEstado === "pendente") {
+        celEstado.style.color = "orange";
+      } else if (novoEstado === "atrasado") {
+        celEstado.style.color = "red";
+      } else {
+        celEstado.style.color = "black";
+        celEstado.style.fontWeight = "normal";
+      }
+    });
+  }
+
+  // Atualiza os estados a cada 3 segundos
+  setInterval(atualizarEstados, 3000);
+  atualizarEstados();
 });
