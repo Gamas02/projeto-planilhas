@@ -1,5 +1,5 @@
 package model;
-import java.util.Date;
+import java.time.LocalDate;
 
 public class Cliente {
     
@@ -9,15 +9,15 @@ public class Cliente {
     private String email;
     private String produto;
     private String estado;
-    private Date data_inicial;
-    private Date data_final;
+    private LocalDate data_inicial;
+    private LocalDate data_final;
 
     // Construtor
 
     public Cliente(){
     }
 
-    public Cliente(Long id, String nome, String email, String produto, String estado, Date data_inicial, Date data_final){
+    public Cliente(Long id, String nome, String email, String produto, String estado, LocalDate data_inicial, LocalDate data_final){
         this.id = id;
         this.nome = nome;
         this.email = email;
@@ -27,7 +27,7 @@ public class Cliente {
         this.data_final = data_final;
     }
 
-    public Cliente(String nome, String email, String produto, String estado, Date data_inicial, Date data_final){
+    public Cliente(String nome, String email, String produto, String estado, LocalDate data_inicial, LocalDate data_final){
         this.nome = nome;
         this.email = email;
         this.produto = produto;
@@ -78,19 +78,19 @@ public class Cliente {
         this.estado = estado;
     }
 
-    public Date getData_inicial() {
+    public LocalDate getData_inicial() {
         return data_inicial;
     }
 
-    public void setData_inicial(Date data_inicial) {
+    public void setData_inicial(LocalDate data_inicial) {
         this.data_inicial = data_inicial;
     }
 
-    public Date getData_final() {
+    public LocalDate getData_final() {
         return data_final;
     }
 
-    public void setData_final(Date data_final) {
+    public void setData_final(LocalDate data_final) {
         this.data_final = data_final;
     }
 
