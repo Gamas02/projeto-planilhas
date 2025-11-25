@@ -7,7 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Date;
+import java.time.LocalDate;
 
 import model.Cliente;
 import model.Produto;
@@ -99,8 +99,8 @@ public class ClienteDAO {
                 stmt.setString(2, cliente.getEmail());
                 stmt.setString(3, cliente.getProduto());
                 stmt.setString(4, cliente.getEstado());
-                stmt.setDate(5, new java.sql.Date(cliente.getData_inicial().getTime()));
-                stmt.setDate(6, new java.sql.Date(cliente.getData_final().getTime()));
+                stmt.setDate(5, java.sql.Date.valueOf(cliente.getData_inicial()));
+                stmt.setDate(6, java.sql.Date.valueOf(cliente.getData_final()));
 
                 stmt.executeUpdate();
 
@@ -133,8 +133,8 @@ public class ClienteDAO {
                 stmt.setString(2, cliente.getEmail());
                 stmt.setString(3, cliente.getProduto());
                 stmt.setString(4, cliente.getEstado());
-                stmt.setDate(5, new java.sql.Date(cliente.getData_inicial().getTime()));
-                stmt.setDate(6, new java.sql.Date(cliente.getData_final().getTime()));        
+                stmt.setDate(5, java.sql.Date.valueOf(cliente.getData_inicial()));
+                stmt.setDate(6, java.sql.Date.valueOf(cliente.getData_final()));        
 
                 int linhasAfetadas = stmt.executeUpdate();
                 System.out.println("Cliente ID: "+ cliente.getId() + " Atualizado.");
@@ -174,4 +174,4 @@ public class ClienteDAO {
 
 }
 
-}
+
