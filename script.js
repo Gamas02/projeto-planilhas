@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
   ===================================================== */
   async function carregarClientes() {
     try {
-      const resposta = await fetch("http://localhost:3306/clientes");
+      const resposta = await fetch("http://localhost:4567/clientes");
       const clientes = await resposta.json();
 
       tabela.innerHTML = "";
@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <td contenteditable="true">${c.nome}</td>
           <td contenteditable="true">${c.email}</td>
           <td contenteditable="true">${c.produto}</td>
-          <td contenteditable="true">${c.estado_pagamento}</td>
+          <td contenteditable="true">${c.estado}</td>
           <td contenteditable="true">${c.data_inicial}</td>
           <td contenteditable="true">${c.data_final}</td>
           <td><button class="btnExcluir">Excluir</button></td>
@@ -53,14 +53,14 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     try {
-      const resposta = await fetch("http://localhost:3306/clientes", {
+      const resposta = await fetch("http://localhost:4567/clientes", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           nome,
           email,
           produto,
-          estado_pagamento: estado,
+          estado: estado,
           data_inicial: dataInicial,
           data_final: dataFinal,
         }),
@@ -85,7 +85,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!confirm(`Excluir cliente ${id}?`)) return;
 
     try {
-      await fetch(`http://localhost:3306/clientes/${id}`, {
+      await fetch(`http://localhost:4567/clientes/${id}`, {
         method: "DELETE",
       });
 
@@ -113,14 +113,14 @@ document.addEventListener("DOMContentLoaded", () => {
           nome: linha.children[1].textContent,
           email: linha.children[2].textContent,
           produto: linha.children[3].textContent,
-          estado_pagamento: linha.children[4].textContent,
+          estado: linha.children[4].textContent,
           data_inicial: linha.children[5].textContent,
           data_final: linha.children[6].textContent,
         };
 
         try {
           await fetch(
-            `http://localhost:3306/clientes/${dados.id_cliente}`,
+            `http://localhost:4567/clientes/${dados.id_cliente}`,
             {
               method: "PUT",
               headers: { "Content-Type": "application/json" },
@@ -196,7 +196,7 @@ document.addEventListener("DOMContentLoaded", () => {
             nome: colunas[1],
             email: colunas[2],
             produto: colunas[3],
-            estado_pagamento: colunas[4],
+            estado: colunas[4],
             data_inicial: colunas[5],
             data_final: colunas[6],
           });
@@ -204,7 +204,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
 
       try {
-        await fetch("http://localhost:3306/clientes/sincronizar", {
+        await fetch("http://localhost:4567/clientes/sincronizar", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(clientes),
