@@ -5,7 +5,40 @@ document.addEventListener("DOMContentLoaded", () => {
   const btnImportar = document.getElementById("btnImportar");
   const inputCSV = document.getElementById("inputCSV");
 
-  // ✅ Adicionar novo cliente à tabela e enviar pro backend
+  /* =====================================================
+     1) GET – CARREGAR CLIENTES AO ABRIR A TELA
+  ===================================================== */
+  async function carregarClientes() {
+    try {
+      const resposta = await fetch("http://localhost:3306/clientes");
+      const clientes = await resposta.json();
+
+      tabela.innerHTML = "";
+
+      clientes.forEach((c) => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${c.id_cliente}</td>
+          <td contenteditable="true">${c.nome}</td>
+          <td contenteditable="true">${c.email}</td>
+          <td contenteditable="true">${c.produto}</td>
+          <td contenteditable="true">${c.estado_pagamento}</td>
+          <td contenteditable="true">${c.data_inicial}</td>
+          <td contenteditable="true">${c.data_final}</td>
+          <td><button class="btnExcluir">Excluir</button></td>
+        `;
+        tabela.appendChild(tr);
+      });
+    } catch (erro) {
+      console.error("Erro ao carregar clientes:", erro);
+    }
+  }
+
+  carregarClientes();
+
+  /* =====================================================
+     2) POST – ADICIONAR NOVO CLIENTE
+  ===================================================== */
   btnAdicionar.addEventListener("click", async () => {
     const nome = document.getElementById("nome").value.trim();
     const email = document.getElementById("email").value.trim();
@@ -19,23 +52,8 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    const novaLinha = document.createElement("tr");
-    const id = tabela.rows.length + 1;
-
-    novaLinha.innerHTML = `
-      <td>${id}</td>
-      <td contenteditable="true">${nome}</td>
-      <td contenteditable="true">${email}</td>
-      <td contenteditable="true">${produto}</td>
-      <td contenteditable="true">${estado}</td>
-      <td contenteditable="true">${dataInicial}</td>
-      <td contenteditable="true">${dataFinal}</td>
-    `;
-    tabela.appendChild(novaLinha);
-
-    // 📨 Enviar JSON para o backend (inserção)
     try {
-      const resposta = await fetch("http://127.0.0.1:1880/clientes", {
+      const resposta = await fetch("http://localhost:3306/clientes", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -48,17 +66,82 @@ document.addEventListener("DOMContentLoaded", () => {
         }),
       });
 
-      const data = await resposta.json();
-      console.log("Cliente cadastrado:", data);
+      await resposta.json();
+      carregarClientes();
     } catch (erro) {
       console.error("Erro ao enviar pro servidor:", erro);
     }
   });
 
-  // 💾 Exportar planilha para CSV
+  /* =====================================================
+     3) DELETE – EXCLUIR LINHA
+  ===================================================== */
+  tabela.addEventListener("click", async (e) => {
+    if (!e.target.classList.contains("btnExcluir")) return;
+
+    const linha = e.target.closest("tr");
+    const id = linha.children[0].textContent;
+
+    if (!confirm(`Excluir cliente ${id}?`)) return;
+
+    try {
+      await fetch(`http://localhost:3306/clientes/${id}`, {
+        method: "DELETE",
+      });
+
+      linha.remove();
+    } catch (erro) {
+      console.error("Erro ao excluir:", erro);
+    }
+  });
+
+  /* =====================================================
+     4) PUT – ATUALIZAR AO EDITAR CELULAR (contenteditable)
+  ===================================================== */
+  let timeout;
+  tabela.addEventListener(
+    "blur",
+    async (e) => {
+      clearTimeout(timeout);
+      timeout = setTimeout(async () => {
+        const celula = e.target;
+        const linha = celula.closest("tr");
+        if (!linha) return;
+
+        const dados = {
+          id_cliente: linha.children[0].textContent,
+          nome: linha.children[1].textContent,
+          email: linha.children[2].textContent,
+          produto: linha.children[3].textContent,
+          estado_pagamento: linha.children[4].textContent,
+          data_inicial: linha.children[5].textContent,
+          data_final: linha.children[6].textContent,
+        };
+
+        try {
+          await fetch(
+            `http://localhost:3306/clientes/${dados.id_cliente}`,
+            {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(dados),
+            }
+          );
+        } catch (erro) {
+          console.error("Erro ao atualizar cliente:", erro);
+        }
+      }, 300);
+    },
+    true
+  );
+
+  /* =====================================================
+     5) EXPORTAR CSV
+  ===================================================== */
   btnExportar.addEventListener("click", () => {
     let csv = "";
     const linhas = document.querySelectorAll("#tabela tr");
+
     linhas.forEach((linha) => {
       const colunas = linha.querySelectorAll("th, td");
       const dados = Array.from(colunas).map((td) => `"${td.textContent}"`);
@@ -72,11 +155,13 @@ document.addEventListener("DOMContentLoaded", () => {
     link.click();
   });
 
-  // Importar CSV e atualizar tabela + banco
+  /* =====================================================
+     6) IMPORTAR CSV + SINCRONIZAR BACKEND
+  ===================================================== */
   btnImportar.addEventListener("click", async () => {
     const arquivo = inputCSV.files[0];
     if (!arquivo) {
-      alert("Escolha um arquivo CSV primeiro!");
+      alert("Escolha um arquivo CSV!");
       return;
     }
 
@@ -84,11 +169,14 @@ document.addEventListener("DOMContentLoaded", () => {
     leitor.onload = async (e) => {
       const conteudo = e.target.result;
       const linhas = conteudo.split("\n").filter((l) => l.trim() !== "");
-      tabela.innerHTML = ""; // limpa tabela atual
+
       const clientes = [];
+
+      tabela.innerHTML = "";
 
       linhas.slice(1).forEach((linha, index) => {
         const colunas = linha.split(",").map((c) => c.replace(/"/g, ""));
+
         if (colunas.length >= 7) {
           const tr = document.createElement("tr");
           tr.innerHTML = `
@@ -99,6 +187,7 @@ document.addEventListener("DOMContentLoaded", () => {
             <td contenteditable="true">${colunas[4]}</td>
             <td contenteditable="true">${colunas[5]}</td>
             <td contenteditable="true">${colunas[6]}</td>
+            <td><button class="btnExcluir">Excluir</button></td>
           `;
           tabela.appendChild(tr);
 
@@ -114,50 +203,25 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       });
 
-      // Enviar tudo para o backend
       try {
-        await fetch("http://127.0.0.1:1880/clientes/sincronizar", {
+        await fetch("http://localhost:3306/clientes/sincronizar", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(clientes),
         });
-        console.log("Banco sincronizado com CSV!");
+
+        carregarClientes();
       } catch (erro) {
-        console.error("Erro ao sincronizar banco:", erro);
+        console.error("Erro ao sincronizar CSV:", erro);
       }
     };
+
     leitor.readAsText(arquivo);
   });
 
-  //  Atualizar banco ao editar uma célula
-  tabela.addEventListener("blur", async (e) => {
-    const celula = e.target;
-    const linha = celula.closest("tr");
-    if (!linha) return;
-
-    const dados = {
-      id_cliente: linha.children[0].textContent,
-      nome: linha.children[1].textContent,
-      email: linha.children[2].textContent,
-      produto: linha.children[3].textContent,
-      estado_pagamento: linha.children[4].textContent,
-      data_inicial: linha.children[5].textContent,
-      data_final: linha.children[6].textContent,
-    };
-
-    try {
-      await fetch("http://127.0.0.1:1880/clientes/atualizar", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(dados),
-      });
-      console.log("Cliente atualizado:", dados.nome);
-    } catch (erro) {
-      console.error("Erro ao atualizar cliente:", erro);
-    }
-  }, true);
-
-  //  Atualiza automaticamente o estado e aplica cores conforme a data/estado
+  /* =====================================================
+     7) ATUALIZAÇÃO AUTOMÁTICA DE ESTADO + CORES
+  ===================================================== */
   function atualizarEstados() {
     const hoje = new Date();
 
@@ -168,32 +232,23 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!celEstado || !celDataFinal) return;
 
       const estado = celEstado.textContent.trim().toLowerCase();
-      const dataTexto = celDataFinal.textContent.trim().replace(/"/g, "");
+      const dataTexto = celDataFinal.textContent.trim();
       const dataFinal = new Date(dataTexto);
 
-      if (isNaN(dataFinal)) return;
-
-      if (estado === "pendente" && hoje > dataFinal) {
+      if (!isNaN(dataFinal) && estado === "pendente" && hoje > dataFinal) {
         celEstado.textContent = "Atrasado";
       }
 
       const novoEstado = celEstado.textContent.trim().toLowerCase();
       celEstado.style.fontWeight = "bold";
 
-      if (novoEstado === "pago") {
-        celEstado.style.color = "green";
-      } else if (novoEstado === "pendente") {
-        celEstado.style.color = "orange";
-      } else if (novoEstado === "atrasado") {
-        celEstado.style.color = "red";
-      } else {
-        celEstado.style.color = "black";
-        celEstado.style.fontWeight = "normal";
-      }
+      if (novoEstado === "pago") celEstado.style.color = "green";
+      else if (novoEstado === "pendente") celEstado.style.color = "orange";
+      else if (novoEstado === "atrasado") celEstado.style.color = "red";
+      else celEstado.style.color = "black";
     });
   }
 
-  // Atualiza os estados a cada 3 segundos
   setInterval(atualizarEstados, 3000);
   atualizarEstados();
 });
