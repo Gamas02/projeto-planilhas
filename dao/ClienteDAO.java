@@ -4,6 +4,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,14 +29,15 @@ public class ClienteDAO {
                         rs.getString("email"),
                         rs.getString("produto"),
                         rs.getString("estado"),
-                        rs.getDate("data_inicial").toLocalDate(),
-                        rs.getDate("data_final").toLocalDate()
+                        rs.getDate("data_inicial") != null ? rs.getDate("data_inicial").toLocalDate() : null,
+                        rs.getDate("data_final") != null ? rs.getDate("data_final").toLocalDate() : null
                 );
                 clientes.add(cliente);
             }
 
         } catch (SQLException e) {
-            System.out.println("Erro ao buscar clientes: " + e.getMessage());
+            System.out.println("Erro ao buscar clientes:");
+            e.printStackTrace();
         }
 
         return clientes;
@@ -57,47 +60,61 @@ public class ClienteDAO {
                             rs.getString("email"),
                             rs.getString("produto"),
                             rs.getString("estado"),
-                            rs.getDate("data_inicial").toLocalDate(),
-                            rs.getDate("data_final").toLocalDate()
+                            rs.getDate("data_inicial") != null ? rs.getDate("data_inicial").toLocalDate() : null,
+                            rs.getDate("data_final") != null ? rs.getDate("data_final").toLocalDate() : null
                     );
                 }
             }
 
         } catch (SQLException e) {
-            System.out.println("Erro ao buscar cliente por ID: " + e.getMessage());
+            System.out.println("Erro ao buscar cliente por ID:");
+            e.printStackTrace();
         }
 
         return cliente;
     }
 
     public void inserir(Cliente cliente) {
-        String sql = "INSERT INTO clientes (nome, email, produto, estado, data_inicial, data_final) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO clientes (nome, email, produto, estado, data_inicial, data_final) " +
+                     "VALUES (?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = ConnectionFactory.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
+             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             stmt.setString(1, cliente.getNome());
             stmt.setString(2, cliente.getEmail());
             stmt.setString(3, cliente.getProduto());
             stmt.setString(4, cliente.getEstado());
-            stmt.setDate(5, java.sql.Date.valueOf(cliente.getData_inicial()));
-            stmt.setDate(6, java.sql.Date.valueOf(cliente.getData_final()));
+
+            if (cliente.getData_inicial() != null) {
+                stmt.setDate(5, java.sql.Date.valueOf(cliente.getData_inicial()));
+            } else {
+                stmt.setNull(5, Types.DATE);
+            }
+
+            if (cliente.getData_final() != null) {
+                stmt.setDate(6, java.sql.Date.valueOf(cliente.getData_final()));
+            } else {
+                stmt.setNull(6, Types.DATE);
+            }
 
             stmt.executeUpdate();
 
             try (ResultSet rs = stmt.getGeneratedKeys()) {
                 if (rs.next()) {
-                    cliente.setId(rs.getLong(1));
+                    cliente.setId_cliente(rs.getLong(1)); // ✅ ID retornado corretamente
                 }
             }
 
         } catch (SQLException e) {
-            System.out.println("Erro ao inserir cliente: " + e.getMessage());
+            System.out.println("Erro ao inserir cliente:");
+            e.printStackTrace();
         }
     }
 
     public void atualizar(Cliente cliente) {
-        String sql = "UPDATE clientes SET nome=?, email=?, produto=?, estado=?, data_inicial=?, data_final=? WHERE id_cliente=?";
+        String sql = "UPDATE clientes SET nome=?, email=?, produto=?, estado=?, data_inicial=?, data_final=? " +
+                     "WHERE id_cliente=?";
 
         try (Connection conn = ConnectionFactory.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -106,14 +123,26 @@ public class ClienteDAO {
             stmt.setString(2, cliente.getEmail());
             stmt.setString(3, cliente.getProduto());
             stmt.setString(4, cliente.getEstado());
-            stmt.setDate(5, java.sql.Date.valueOf(cliente.getData_inicial()));
-            stmt.setDate(6, java.sql.Date.valueOf(cliente.getData_final()));
-            stmt.setLong(7, cliente.getId());
+
+            if (cliente.getData_inicial() != null) {
+                stmt.setDate(5, java.sql.Date.valueOf(cliente.getData_inicial()));
+            } else {
+                stmt.setNull(5, Types.DATE);
+            }
+
+            if (cliente.getData_final() != null) {
+                stmt.setDate(6, java.sql.Date.valueOf(cliente.getData_final()));
+            } else {
+                stmt.setNull(6, Types.DATE);
+            }
+
+            stmt.setLong(7, cliente.getId_cliente());
 
             stmt.executeUpdate();
 
         } catch (SQLException e) {
-            System.out.println("Erro ao atualizar cliente: " + e.getMessage());
+            System.out.println("Erro ao atualizar cliente:");
+            e.printStackTrace();
         }
     }
 
@@ -127,7 +156,8 @@ public class ClienteDAO {
             stmt.executeUpdate();
 
         } catch (SQLException e) {
-            System.out.println("Erro ao deletar cliente: " + e.getMessage());
+            System.out.println("Erro ao deletar cliente:");
+            e.printStackTrace();
         }
     }
 }

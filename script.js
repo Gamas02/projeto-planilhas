@@ -80,18 +80,30 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!e.target.classList.contains("btnExcluir")) return;
 
     const linha = e.target.closest("tr");
-    const id = linha.children[0].textContent;
+    const id = linha.children[0]?.textContent?.trim();
+
+    if (!id || id === "undefined") {
+      alert("ID inválido. Recarregue a página.");
+      console.error("ID inválido:", id);
+      return;
+    }
 
     if (!confirm(`Excluir cliente ${id}?`)) return;
 
     try {
-      await fetch(`http://localhost:4567/clientes/${id}`, {
+      const resposta = await fetch(`http://localhost:4567/clientes/${id}`, {
         method: "DELETE",
       });
 
+      if (!resposta.ok) {
+        const erro = await resposta.text();
+        console.error("Erro ao excluir:", erro);
+        return;
+      }
+
       linha.remove();
     } catch (erro) {
-      console.error("Erro ao excluir:", erro);
+      console.error("Erro de rede ao excluir:", erro);
     }
   });
 
@@ -119,14 +131,11 @@ document.addEventListener("DOMContentLoaded", () => {
         };
 
         try {
-          await fetch(
-            `http://localhost:4567/clientes/${dados.id_cliente}`,
-            {
-              method: "PUT",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(dados),
-            }
-          );
+          await fetch(`http://localhost:4567/clientes/${dados.id_cliente}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(dados),
+          });
         } catch (erro) {
           console.error("Erro ao atualizar cliente:", erro);
         }

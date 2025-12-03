@@ -92,6 +92,21 @@ public class ApiCliente {
                 }
             }
         });
+        post("/clientes", (req, res) -> {
+            try {
+                Cliente novo = gson.fromJson(req.body(), Cliente.class);
+
+                clienteDao.inserir(novo);
+
+                res.status(201);
+                return gson.toJson(novo);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                res.status(500);
+                return "{\"mensagem\":\"Erro ao inserir cliente\"}";
+            }
+        });
 
         post("/clientes/sincronizar", (request, response) -> {
             try {
@@ -99,7 +114,8 @@ public class ApiCliente {
 
                 for (Cliente c : clientes) {
 
-                    if (c.getId() != null && clienteDao.buscarPorId(c.getId()) != null) {
+                    if (c.getId_cliente() != null && clienteDao.buscarPorId(c.getId_cliente()) != null){
+
                         clienteDao.atualizar(c);
                     } else {
                         clienteDao.inserir(c);
@@ -116,8 +132,8 @@ public class ApiCliente {
             }
         });
 
-        // PUT /produtos/:id - Atualizar cliente existente
-        put("/clientes/:id", new Route() {
+    // PUT /produtos/:id - Atualizar cliente existente
+    put("/clientes/:id", new Route() {
             @Override
             public Object handle(Request request, Response response) {
                 try {
@@ -129,7 +145,8 @@ public class ApiCliente {
                     }
 
                     Cliente clienteParaAtualizar = gson.fromJson(request.body(), Cliente.class);
-                    clienteParaAtualizar.setId(id); // garante que o ID da URL seja usado
+                    clienteParaAtualizar.setId_cliente(id);
+
 
                     clienteDao.atualizar(clienteParaAtualizar);
 
