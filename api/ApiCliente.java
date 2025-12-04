@@ -114,7 +114,7 @@ public class ApiCliente {
 
                 for (Cliente c : clientes) {
 
-                    if (c.getId_cliente() != null && clienteDao.buscarPorId(c.getId_cliente()) != null){
+                    if (c.getId_cliente() != null && clienteDao.buscarPorId(c.getId_cliente()) != null) {
 
                         clienteDao.atualizar(c);
                     } else {
@@ -132,8 +132,8 @@ public class ApiCliente {
             }
         });
 
-    // PUT /produtos/:id - Atualizar cliente existente
-    put("/clientes/:id", new Route() {
+        // PUT /produtos/:id - Atualizar cliente existente
+        put("/clientes/:id", new Route() {
             @Override
             public Object handle(Request request, Response response) {
                 try {
@@ -146,7 +146,6 @@ public class ApiCliente {
 
                     Cliente clienteParaAtualizar = gson.fromJson(request.body(), Cliente.class);
                     clienteParaAtualizar.setId_cliente(id);
-
 
                     clienteDao.atualizar(clienteParaAtualizar);
 

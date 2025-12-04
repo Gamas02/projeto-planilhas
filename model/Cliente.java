@@ -12,10 +12,11 @@ public class Cliente {
     private LocalDate data_inicial;
     private LocalDate data_final;
 
-    public Cliente() {}
+    public Cliente() {
+    }
 
     public Cliente(Long id_cliente, String nome, String email, String produto,
-                   String estado, LocalDate data_inicial, LocalDate data_final) {
+            String estado, LocalDate data_inicial, LocalDate data_final) {
         this.id_cliente = id_cliente;
         this.nome = nome;
         this.email = email;
@@ -36,21 +37,51 @@ public class Cliente {
 
     // ====== OUTROS GETTERS E SETTERS ======
 
-    public String getNome() { return nome; }
-    public void setNome(String nome) { this.nome = nome; }
+    public String getNome() {
+        return nome;
+    }
 
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
 
-    public String getProduto() { return produto; }
-    public void setProduto(String produto) { this.produto = produto; }
+    public String getEmail() {
+        return email;
+    }
 
-    public String getEstado() { return estado; }
-    public void setEstado(String estado) { this.estado = estado; }
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
-    public LocalDate getData_inicial() { return data_inicial; }
-    public void setData_inicial(LocalDate data_inicial) { this.data_inicial = data_inicial; }
+    public String getProduto() {
+        return produto;
+    }
 
-    public LocalDate getData_final() { return data_final; }
-    public void setData_final(LocalDate data_final) { this.data_final = data_final; }
+    public void setProduto(String produto) {
+        this.produto = produto;
+    }
+
+    public String getEstado() {
+        return estado;
+    }
+
+    public void setEstado(String estado) {
+        this.estado = estado;
+    }
+
+    public LocalDate getData_inicial() {
+        return data_inicial;
+    }
+
+    public void setData_inicial(LocalDate data_inicial) {
+        this.data_inicial = data_inicial;
+    }
+
+    public LocalDate getData_final() {
+        return data_final;
+    }
+
+    public void setData_final(LocalDate data_final) {
+        this.data_final = data_final;
+    }
 }

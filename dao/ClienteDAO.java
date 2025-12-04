@@ -19,8 +19,8 @@ public class ClienteDAO {
         String sql = "SELECT * FROM clientes";
 
         try (Connection conn = ConnectionFactory.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
+                PreparedStatement stmt = conn.prepareStatement(sql);
+                ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
                 Cliente cliente = new Cliente(
@@ -30,8 +30,7 @@ public class ClienteDAO {
                         rs.getString("produto"),
                         rs.getString("estado"),
                         rs.getDate("data_inicial") != null ? rs.getDate("data_inicial").toLocalDate() : null,
-                        rs.getDate("data_final") != null ? rs.getDate("data_final").toLocalDate() : null
-                );
+                        rs.getDate("data_final") != null ? rs.getDate("data_final").toLocalDate() : null);
                 clientes.add(cliente);
             }
 
@@ -48,7 +47,7 @@ public class ClienteDAO {
         String sql = "SELECT * FROM clientes WHERE id_cliente = ?";
 
         try (Connection conn = ConnectionFactory.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setLong(1, id);
 
@@ -61,8 +60,7 @@ public class ClienteDAO {
                             rs.getString("produto"),
                             rs.getString("estado"),
                             rs.getDate("data_inicial") != null ? rs.getDate("data_inicial").toLocalDate() : null,
-                            rs.getDate("data_final") != null ? rs.getDate("data_final").toLocalDate() : null
-                    );
+                            rs.getDate("data_final") != null ? rs.getDate("data_final").toLocalDate() : null);
                 }
             }
 
@@ -76,10 +74,10 @@ public class ClienteDAO {
 
     public void inserir(Cliente cliente) {
         String sql = "INSERT INTO clientes (nome, email, produto, estado, data_inicial, data_final) " +
-                     "VALUES (?, ?, ?, ?, ?, ?)";
+                "VALUES (?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = ConnectionFactory.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+                PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             stmt.setString(1, cliente.getNome());
             stmt.setString(2, cliente.getEmail());
@@ -114,10 +112,10 @@ public class ClienteDAO {
 
     public void atualizar(Cliente cliente) {
         String sql = "UPDATE clientes SET nome=?, email=?, produto=?, estado=?, data_inicial=?, data_final=? " +
-                     "WHERE id_cliente=?";
+                "WHERE id_cliente=?";
 
         try (Connection conn = ConnectionFactory.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, cliente.getNome());
             stmt.setString(2, cliente.getEmail());
@@ -150,7 +148,7 @@ public class ClienteDAO {
         String sql = "DELETE FROM clientes WHERE id_cliente = ?";
 
         try (Connection conn = ConnectionFactory.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setLong(1, id);
             stmt.executeUpdate();
